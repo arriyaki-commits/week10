@@ -49,4 +49,39 @@ class AdminController extends Controller
         DB::table('blogs')->where('id', $id)->delete();
         return redirect('/blogs');
     }
+    function change($id){
+      $blogs = DB::table("blogs")->where('id', $id)->first();
+      $data=[
+        'status'=>$blogs->status
+      ];
+      if($blogs->status ==0){
+        $data=['status'=>1];
+      }else{
+        $data=['status'=>0];
+      }
+
+      DB::table("blogs")->where('id', $id)->update($data);
+      return redirect('/blogs');
+    }
+     function edit($id){
+         $blogs = DB::table("blogs")->where('id', $id)->first();
+        return view("edit", compact('blogs'));
+     }
+    function update(Request $request, $id)
+{
+    $request->validate([
+        'title' => 'required|max:50',
+        'content' => 'required',
+    ], [
+        'title.required' => 'กรุณาใส่ชื่อบทความ',
+        'title.max' => 'ชื่อบทความต้องไม่เกิน 50 ตัวอักษร',
+        'content.required' => 'กรุณาใส่เนื้อหา',
+    ]);
+    $data = [
+        'title' => $request->title,
+        'content' => $request->content,
+    ];
+    DB::table("blogs")->where('id', $id)->update($data);
+    return redirect('/blogs');
+}
 }
